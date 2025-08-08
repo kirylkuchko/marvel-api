@@ -13,17 +13,19 @@ class RandomChar extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            charData: {},
+            character: {},
             loadCharacterState : RandomChar.IS_LOADING,
         }
+    }
+
+    componentDidMount() {
         this.getRandomCharacter();
     }
 
-
     marvelService = new MarvelService();
 
-    onCharLoaded = (charData) => {
-        this.setState({charData, loadCharacterState: RandomChar.IS_LOADED});
+    onCharLoaded = (character) => {
+        this.setState({character, loadCharacterState: RandomChar.IS_LOADED});
     }
     
     onCharLoadingError = (error) => {
@@ -32,6 +34,7 @@ class RandomChar extends Component {
     }
 
     getRandomCharacter = () => {
+        this.setState({loadCharacterState: RandomChar.IS_LOADING});
         const randomCharacterId = Math.floor(Math.random() * (20 - 1) + 1);
         this.marvelService.getCharacter(randomCharacterId)
             .then(this.onCharLoaded)
@@ -39,7 +42,7 @@ class RandomChar extends Component {
     }
 
     render() {
-        const { loadCharacterState, charData } = this.state;
+        const { loadCharacterState, character } = this.state;
         let characterView;
 
         switch(loadCharacterState) {
@@ -47,7 +50,7 @@ class RandomChar extends Component {
                 characterView = <Spinner/>
                 break;
             case RandomChar.IS_LOADED:
-                characterView =<CharacterView {...charData}></CharacterView>
+                characterView =<CharacterView {...character}></CharacterView>
                 break;
             case RandomChar.IS_ERROR:
                 characterView = <ErrorMessage/>
@@ -68,7 +71,7 @@ class RandomChar extends Component {
                     <p className="randomchar__title">
                         Or choose another one
                     </p>
-                    <button className="button button__main">
+                    <button className="button button__main" onClick={this.getRandomCharacter}>
                         <div className="inner">try it</div>
                     </button>
                     <img src={mjolnir} alt="mjolnir" className="randomchar__decoration"/>

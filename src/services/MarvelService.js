@@ -1,3 +1,5 @@
+import Character from "../models/Character";
+
 export default class MarvelService {
     _apiUrl = 'https://marvel-server-zeta.vercel.app/';
     _apiKey = 'apikey=d4eecb0c66dedbfae4eab45d312fc1df';
@@ -40,14 +42,7 @@ export default class MarvelService {
             return undefined;
         }
 
-        return {
-            id: charcterData.id,
-            name: charcterData.name,
-            description: charcterData.description,
-            img: charcterData.thumbnail.path + '.' + charcterData.thumbnail.extension,
-            comics: charcterData.comics.items,
-            marvelUrl: charcterData.urls[0].url,
-            wikiUrl: charcterData.urls[1].url
-        }
+        return new Character(charcterData.id, charcterData.name, charcterData.description, charcterData.thumbnail.path,
+                charcterData.thumbnail.extension, charcterData.comics.items, charcterData.urls[0].url, charcterData.urls[1].url);
     }
 }
