@@ -15,15 +15,15 @@ export default class MarvelService {
     }
 
     getCharacters = async (offset = 0) => {
-        return this.#getCharactersDataFromResponse(await this.getResource(`${this._apiUrl}characters?limit=9&offset=${offset}&${this._apiKey}`));
+        return this.#getCharactersFromResponse(await this.getResource(`${this._apiUrl}characters?limit=9&offset=${offset}&${this._apiKey}`));
     }
 
     getCharacter = async (id) => {
         const response = await this.getResource(`${this._apiUrl}characters/${id}?${this._apiKey}`);
-        return this.#getCharacterDataFromResponse(response.data.results[0]);
+        return this.#getCharacterFromResponse(response.data.results[0]);
     }
 
-    #getCharactersDataFromResponse = (response) => {
+    #getCharactersFromResponse = (response) => {
         if (!response) {
             throw new Error(`Incorrect data from server on fetching characters data`);
         }
@@ -31,13 +31,13 @@ export default class MarvelService {
         const charactersData = [];
 
         for (let charcterData of response.data.results) {
-            charactersData.push(this.#getCharacterDataFromResponse(charcterData));
+            charactersData.push(this.#getCharacterFromResponse(charcterData));
         }
 
         return charactersData;
     }
 
-    #getCharacterDataFromResponse = (charcterData) => {
+    #getCharacterFromResponse = (charcterData) => {
         if (!charcterData) {
             return undefined;
         }
