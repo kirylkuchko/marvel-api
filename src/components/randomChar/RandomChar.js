@@ -10,6 +10,8 @@ class RandomChar extends Component {
     static IS_LOADED = 'loaded';
     static IS_ERROR = 'error';
 
+    marvelService = new MarvelService();
+
     constructor (props) {
         super(props);
         this.state = {
@@ -21,8 +23,6 @@ class RandomChar extends Component {
     componentDidMount() {
         this.getRandomCharacter();
     }
-
-    marvelService = new MarvelService();
 
     onCharLoaded = (character) => {
         this.setState({character, loadCharacterState: RandomChar.IS_LOADED});

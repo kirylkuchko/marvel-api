@@ -14,8 +14,8 @@ export default class MarvelService {
         return await res.json();
     }
 
-    getCharacters = async () => {
-        return this.#getCharactersDataFromResponse(await this.getResource(`${this._apiUrl}characters?limit=9&${this._apiKey}`));
+    getCharacters = async (offset = 0) => {
+        return this.#getCharactersDataFromResponse(await this.getResource(`${this._apiUrl}characters?limit=9&offset=${offset}&${this._apiKey}`));
     }
 
     getCharacter = async (id) => {

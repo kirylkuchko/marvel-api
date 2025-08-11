@@ -6,7 +6,10 @@ class CharList extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            characters: []
+            characters: [],
+            isCharactersLoading: true,
+            offset: 0,
+            isAllCharactersLoaded: false
         }
     }
 
@@ -17,12 +20,18 @@ class CharList extends Component {
     }
 
     getCharacters = () => {
-        this.marvelService.getCharacters()
+        this.marvelService.getCharacters(this.state.offset)
             .then(this.onCharactersLoaded)
     }
 
-    onCharactersLoaded = (characters) => {
-        this.setState({characters});
+    onCharactersLoaded = (newCharacters) => {
+        const newIsAllCharactersLoadedValue = newCharacters.length !== 9;
+        this.setState(({characters, offset}) => ({
+            characters: [...characters, ...newCharacters],
+            isCharactersLoading: false,
+            offset: offset + 9,
+            isAllCharactersLoaded: newIsAllCharactersLoadedValue
+        }));
     }
 
     getCharactersItemsElements = () => {
@@ -37,7 +46,10 @@ class CharList extends Component {
                 <ul className="char__grid">
                     {this.getCharactersItemsElements()}
                 </ul>
-                <button className="button button__main button__long">
+                <button className="button button__main button__long"
+                    onClick={this.getCharacters}
+                    disabled={this.state.isCharactersLoading}
+                    style={{display: this.state.isAllCharactersLoaded ? 'none' : 'block'}}>
                     <div className="inner">load more</div>
                 </button>
             </div>
