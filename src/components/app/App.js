@@ -4,25 +4,37 @@ import CharList from "../charList/CharList";
 import CharInfo from "../charInfo/CharInfo";
 import ErrorBoundary from "../errorBoundary/ErrorBoundary";
 import decoration from '../../resources/img/vision.png';
+import { Component } from "react";
 
-const App = () => {
-    return (
-        <div className="app">
-            <AppHeader/>
-            <main>
-                <ErrorBoundary errorMessage={'Failed to load the character'}>
-                    <RandomChar/>
-                </ErrorBoundary>
-                <div className="char__content">
-                    <ErrorBoundary errorMessage={'Failed to load the characters'}>
-                        <CharList/>
+export default class App extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            selectedCharacter: null
+        }
+    }
+
+    onCharacterSelect = (selectedCharacter) => {
+        this.setState({selectedCharacter});
+    }
+
+    render() {
+        return (
+            <div className="app">
+                <AppHeader/>
+                <main>
+                    <ErrorBoundary errorMessage={'Failed to load the character'}>
+                        <RandomChar/>
                     </ErrorBoundary>
-                    <CharInfo/>
-                </div>
-                <img className="bg-decoration" src={decoration} alt="vision"/>
-            </main>
-        </div>
-    )
+                    <div className="char__content">
+                        <ErrorBoundary errorMessage={'Failed to load the characters'}>
+                            <CharList onCharacterSelect={this.onCharacterSelect}/>
+                        </ErrorBoundary>
+                        <CharInfo character={this.state.selectedCharacter}/>
+                    </div>
+                    <img className="bg-decoration" src={decoration} alt="vision"/>
+                </main>
+            </div>
+        )
+    }
 }
-
-export default App;

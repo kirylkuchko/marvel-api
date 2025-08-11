@@ -36,7 +36,11 @@ class CharList extends Component {
 
     getCharactersItemsElements = () => {
         return this.state.characters.map((character) => {
-            return <CharItem key={character.id} name={character.name} img={character.img}/>
+            return <CharItem 
+                key={character.id} 
+                name={character.name} 
+                img={character.img} 
+                onCharacterSelect={() => {this.props.onCharacterSelect(character)}}/>
         });
     }
 
@@ -60,10 +64,10 @@ class CharList extends Component {
 export default CharList;
 
 const CharItem = (props) => {
-    const { name, img } = props;
+    const { name, img, onCharacterSelect } = props;
 
     return (
-        <li className="char__item">
+        <li className="char__item" onClick={onCharacterSelect}>
             <img src={img} alt={name}/>
             <div className="char__name">{name}</div>
         </li> 
