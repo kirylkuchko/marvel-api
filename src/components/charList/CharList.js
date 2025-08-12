@@ -1,6 +1,7 @@
 import './charList.scss';
 import MarvelService from '../../services/MarvelService';
 import { Component } from 'react';
+import PropTypes from 'prop-types';
 
 class CharList extends Component {
     constructor (props) {
@@ -9,7 +10,8 @@ class CharList extends Component {
             characters: [],
             isCharactersLoading: true,
             offset: 0,
-            isAllCharactersLoaded: false
+            isAllCharactersLoaded: false,
+            selectedCharacterId: null
         }
     }
 
@@ -40,8 +42,14 @@ class CharList extends Component {
                 key={character.id} 
                 name={character.name} 
                 img={character.img} 
-                onCharacterSelect={() => {this.props.onCharacterSelect(character)}}/>
+                onCharacterSelect={() => {this.onCharacterSelect(character)}}
+                isSelected={this.state.selectedCharacterId === character.id}/>
         });
+    }
+
+    onCharacterSelect = (character) => {
+        this.props.onCharacterSelect(character);
+        this.setState({selectedCharacterId: character.id});
     }
 
     render () {
@@ -61,13 +69,18 @@ class CharList extends Component {
     }
 }
 
+CharList.propTypes = {
+    onCharacterSelect: PropTypes.func
+}
+
 export default CharList;
 
 const CharItem = (props) => {
-    const { name, img, onCharacterSelect } = props;
+    const { name, img, onCharacterSelect, isSelected } = props;
+    const className = 'char__item' + (isSelected ? ' selected' : '');
 
     return (
-        <li className="char__item" onClick={onCharacterSelect}>
+        <li className={className} onClick={onCharacterSelect}>
             <img src={img} alt={name}/>
             <div className="char__name">{name}</div>
         </li> 
