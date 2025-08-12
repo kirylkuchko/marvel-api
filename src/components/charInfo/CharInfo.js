@@ -4,6 +4,10 @@ const CharInfo = (props) => {
     const {name, img, description, marvelUrl, wikiUrl, comics} = props.character;
 
     const getComicsItems = () => {
+        if (!comics) {
+            return;
+        }
+
         return comics.map(comics => {
             return <ComicsItem comicsName={comics}/>
         })

@@ -1,76 +1,63 @@
 import './charList.scss';
 import MarvelService from '../../services/MarvelService';
-import { Component } from 'react';
-import PropTypes from 'prop-types';
+import { useState, useEffect } from 'react';
 
-class CharList extends Component {
-    constructor (props) {
-        super(props);
-        this.state = {
-            characters: [],
-            isCharactersLoading: true,
-            offset: 0,
-            isAllCharactersLoaded: false,
-            selectedCharacterId: null
-        }
+const CharList = (props) => {
+    const [characters, setCharacters] = useState([]);
+    const [isCharactersLoading, setIsCharactersLoading] = useState(true);
+    const [offset, setOffset] = useState(0);
+    const [isAllCharactersLoaded, setIsAllCharactersLoaded] = useState(false);
+    const [selectedCharacterId, setSelectedCharacterId] = useState(null);
+
+    const marvelService = new MarvelService();
+
+    useEffect(() => {
+        getCharacters();
+    }, [])
+
+
+    const getCharacters = () => {
+        marvelService.getCharacters(offset)
+            .then(onCharactersLoaded)
     }
 
-    marvelService = new MarvelService();
-
-    componentDidMount() {
-        this.getCharacters();
-    }
-
-    getCharacters = () => {
-        this.marvelService.getCharacters(this.state.offset)
-            .then(this.onCharactersLoaded)
-    }
-
-    onCharactersLoaded = (newCharacters) => {
+    const onCharactersLoaded = (newCharacters) => {
         const newIsAllCharactersLoadedValue = newCharacters.length !== 9;
-        this.setState(({characters, offset}) => ({
-            characters: [...characters, ...newCharacters],
-            isCharactersLoading: false,
-            offset: offset + 9,
-            isAllCharactersLoaded: newIsAllCharactersLoadedValue
-        }));
+        setCharacters((characters) => [...characters, ...newCharacters]);
+        setIsCharactersLoading(false);
+        setOffset(offset => offset + 9);
+        setIsAllCharactersLoaded(newIsAllCharactersLoadedValue);
     }
 
-    getCharactersItemsElements = () => {
-        return this.state.characters.map((character) => {
+    const onCharacterSelect = (character) => {
+        setSelectedCharacterId(character.id);
+        props.onCharacterSelect(character);
+    }
+
+    const getCharactersItemsElements = () => {
+        return characters.map((character) => {
             return <CharItem 
                 key={character.id} 
                 name={character.name} 
                 img={character.img} 
-                onCharacterSelect={() => {this.onCharacterSelect(character)}}
-                isSelected={this.state.selectedCharacterId === character.id}/>
+                onCharacterSelect={() => {onCharacterSelect(character)}}
+                isSelected={selectedCharacterId === character.id}/>
         });
     }
 
-    onCharacterSelect = (character) => {
-        this.props.onCharacterSelect(character);
-        this.setState({selectedCharacterId: character.id});
-    }
-
-    render () {
-        return (
-            <div className="char__list">
-                <ul className="char__grid">
-                    {this.getCharactersItemsElements()}
-                </ul>
-                <button className="button button__main button__long"
-                    onClick={this.getCharacters}
-                    disabled={this.state.isCharactersLoading}
-                    style={{display: this.state.isAllCharactersLoaded ? 'none' : 'block'}}>
-                    <div className="inner">load more</div>
-                </button>
-            </div>
-        )
-    }
-}
-
-CharList.propTypes = {
-    onCharacterSelect: PropTypes.func
+    return (
+        <div className="char__list">
+            <ul className="char__grid">
+                {getCharactersItemsElements()}
+            </ul>
+            <button className="button button__main button__long"
+                onClick={getCharacters}
+                disabled={isCharactersLoading}
+                style={{display: isAllCharactersLoaded ? 'none' : 'block'}}>
+                <div className="inner">load more</div>
+            </button>
+        </div>
+    )
 }
 
 export default CharList;

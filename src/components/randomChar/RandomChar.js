@@ -1,58 +1,49 @@
 import './randomChar.scss';
 import mjolnir from '../../resources/img/mjolnir.png';
-import { Component } from 'react';
+import { useState, useEffect } from 'react';
 import MarvelService from '../../services/MarvelService';
 import Spinner from '../spinner/Spinner';
 import ErrorMessage from '../errorMessage/errorMessage';
+import ComponentAsynState from '../ComponentAsynState';
 
-class RandomChar extends Component {
-    static IS_LOADING = 'loading';
-    static IS_LOADED = 'loaded';
-    static IS_ERROR = 'error';
+const RandomChar = (props) => {
+    const [character, setCharacter] = useState({});
+    const [loadCharacterState, setLoadCharacterState] = useState(ComponentAsynState.IS_LOADING);
 
-    marvelService = new MarvelService();
+    const marvelService = new MarvelService();
 
-    constructor (props) {
-        super(props);
-        this.state = {
-            character: {},
-            loadCharacterState : RandomChar.IS_LOADING,
-        }
-    }
+    useEffect(() => {
+        getRandomCharacter();
+    }, []);
 
-    componentDidMount() {
-        this.getRandomCharacter();
-    }
-
-    onCharLoaded = (character) => {
-        this.setState({character, loadCharacterState: RandomChar.IS_LOADED});
+    const onCharLoaded = (character) => {
+        setCharacter(character);
+        setLoadCharacterState(ComponentAsynState.IS_LOADED);
     }
     
-    onCharLoadingError = (error) => {
+    const onCharLoadingError = (error) => {
         console.error(error);
-        this.setState({loadCharacterState: RandomChar.IS_ERROR});
+        setLoadCharacterState(ComponentAsynState.IS_ERROR);
     }
 
-    getRandomCharacter = () => {
-        this.setState({loadCharacterState: RandomChar.IS_LOADING});
+    const getRandomCharacter = () => {
+        setLoadCharacterState(ComponentAsynState.IS_LOADING);
         const randomCharacterId = Math.floor(Math.random() * (20 - 1) + 1);
-        this.marvelService.getCharacter(randomCharacterId)
-            .then(this.onCharLoaded)
-            .catch((e) => this.onCharLoadingError(e));
+        marvelService.getCharacter(randomCharacterId)
+            .then(onCharLoaded)
+            .catch((e) => onCharLoadingError(e));
     }
 
-    render() {
-        const { loadCharacterState, character } = this.state;
+    const getCharacterView = () => {
         let characterView;
-
         switch(loadCharacterState) {
-            case RandomChar.IS_LOADING:
+            case ComponentAsynState.IS_LOADING:
                 characterView = <Spinner/>
                 break;
-            case RandomChar.IS_LOADED:
+            case ComponentAsynState.IS_LOADED:
                 characterView =<CharacterView {...character}></CharacterView>
                 break;
-            case RandomChar.IS_ERROR:
+            case ComponentAsynState.IS_ERROR:
                 characterView = <ErrorMessage/>
                 break;
             default:
@@ -60,25 +51,28 @@ class RandomChar extends Component {
                 break;
         }
 
-        return (
-            <div className="randomchar">
-                {characterView}
-                <div className="randomchar__static">
-                    <p className="randomchar__title">
-                        Random character for today!<br/>
-                        Do you want to get to know him better?
-                    </p>
-                    <p className="randomchar__title">
-                        Or choose another one
-                    </p>
-                    <button className="button button__main" onClick={this.getRandomCharacter}>
-                        <div className="inner">try it</div>
-                    </button>
-                    <img src={mjolnir} alt="mjolnir" className="randomchar__decoration"/>
-                </div>
+        return characterView;
+    }
+
+
+    return (
+        <div className="randomchar">
+            {getCharacterView()}
+            <div className="randomchar__static">
+                <p className="randomchar__title">
+                    Random character for today!<br/>
+                    Do you want to get to know him better?
+                </p>
+                <p className="randomchar__title">
+                    Or choose another one
+                </p>
+                <button className="button button__main" onClick={getRandomCharacter}>
+                    <div className="inner">try it</div>
+                </button>
+                <img src={mjolnir} alt="mjolnir" className="randomchar__decoration"/>
             </div>
-        )
-    }  
+        </div>
+    )
 }
 
 export default RandomChar;
