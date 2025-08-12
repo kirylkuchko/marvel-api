@@ -4,6 +4,7 @@ import CharList from "../charList/CharList";
 import CharInfo from "../charInfo/CharInfo";
 import ErrorBoundary from "../errorBoundary/ErrorBoundary";
 import decoration from '../../resources/img/vision.png';
+import Skeleton from "../skeleton/Skeleton";
 import { Component } from "react";
 
 export default class App extends Component {
@@ -30,7 +31,10 @@ export default class App extends Component {
                         <ErrorBoundary errorMessage={'Failed to load the characters'}>
                             <CharList onCharacterSelect={this.onCharacterSelect}/>
                         </ErrorBoundary>
-                        <CharInfo character={this.state.selectedCharacter}/>
+                        {this.state.selectedCharacter ? 
+                            <CharInfo character={this.state.selectedCharacter}/> :
+                            <Skeleton></Skeleton>}
+                        
                     </div>
                     <img className="bg-decoration" src={decoration} alt="vision"/>
                 </main>
