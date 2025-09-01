@@ -1,21 +1,16 @@
+import Skeleton from '../skeleton/Skeleton';
 import './charInfo.scss';
 
 const CharInfo = (props) => {
-    const {name, img, description, marvelUrl, wikiUrl, comics} = props.character;
-
-    const getComicsItems = () => {
-        if (!comics) {
-            return;
+    const getCharInfoView = () => {
+        if (!props.character) {
+            return <Skeleton/>
         }
 
-        return comics.map(comics => {
-            return <ComicsItem comicsName={comics}/>
-        })
-    }
-
-    return (
-        <div className="char__info">
-            <div className="char__basics">
+        const {name, img, description, marvelUrl, wikiUrl, comics} = props.character;
+        return (
+            <>
+                <div className="char__basics">
                 <img src={img} alt={name}/>
                 <div>
                     <div className="char__info-name">{name}</div>
@@ -28,24 +23,37 @@ const CharInfo = (props) => {
                         </a>
                     </div>
                 </div>
-            </div>
-            <div className="char__descr">
-                {description}
-            </div>
-            <div className="char__comics">Comics:</div>
+                </div>
+                <div className="char__descr">
+                    {description}
+                </div>
+                <div className="char__comics">Comics:</div>
+                {getComicsList(comics)}
+            </>
+        );
+    }
+
+    const getComicsList = (comics) => {
+        if (!comics) {
+            return;
+        }
+
+        return (
             <ul className="char__comics-list">
-                {getComicsItems()}
+                {comics.map((comics) => (
+                    <li key={comics} className="char__comics-item">
+                        {comics}
+                    </li>
+                ))}
             </ul>
+        );
+    }
+
+    return (
+        <div className="char__info">
+            {getCharInfoView()}
         </div>
     )
 }
 
 export default CharInfo;
-
-const ComicsItem = (props) => {
-    return (
-        <li className="char__comics-item">
-            {props.comicsName}
-        </li>
-    )
-}

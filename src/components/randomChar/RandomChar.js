@@ -1,57 +1,34 @@
 import './randomChar.scss';
 import mjolnir from '../../resources/img/mjolnir.png';
 import { useState, useEffect } from 'react';
-import MarvelService from '../../services/MarvelService';
+import useMarvelService from '../../services/MarvelService';
 import Spinner from '../spinner/Spinner';
 import ErrorMessage from '../errorMessage/errorMessage';
-import ComponentAsynState from '../ComponentAsynState';
 
 const RandomChar = (props) => {
     const [character, setCharacter] = useState({});
-    const [loadCharacterState, setLoadCharacterState] = useState(ComponentAsynState.IS_LOADING);
-
-    const marvelService = new MarvelService();
+    const { getCharacter, loading, error, clearError } = useMarvelService();
 
     useEffect(() => {
         getRandomCharacter();
     }, []);
 
-    const onCharLoaded = (character) => {
-        setCharacter(character);
-        setLoadCharacterState(ComponentAsynState.IS_LOADED);
-    }
-    
-    const onCharLoadingError = (error) => {
-        console.error(error);
-        setLoadCharacterState(ComponentAsynState.IS_ERROR);
-    }
-
     const getRandomCharacter = () => {
-        setLoadCharacterState(ComponentAsynState.IS_LOADING);
+        clearError(); // If previous  request was also with error
         const randomCharacterId = Math.floor(Math.random() * (20 - 1) + 1);
-        marvelService.getCharacter(randomCharacterId)
-            .then(onCharLoaded)
-            .catch((e) => onCharLoadingError(e));
+        getCharacter(randomCharacterId).then(setCharacter);
     }
 
     const getCharacterView = () => {
-        let characterView;
-        switch(loadCharacterState) {
-            case ComponentAsynState.IS_LOADING:
-                characterView = <Spinner/>
-                break;
-            case ComponentAsynState.IS_LOADED:
-                characterView =<CharacterView {...character}></CharacterView>
-                break;
-            case ComponentAsynState.IS_ERROR:
-                characterView = <ErrorMessage/>
-                break;
-            default:
-                characterView = <Spinner/>
-                break;
+        if (!loading && !error) {
+            return <CharacterView {...character}></CharacterView>;
         }
 
-        return characterView;
+        if (error) {
+            return <ErrorMessage/>;
+        }
+
+        return <Spinner/>;
     }
 
 

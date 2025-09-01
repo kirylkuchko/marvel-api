@@ -1,37 +1,33 @@
 import './charList.scss';
-import MarvelService from '../../services/MarvelService';
+import useMarvelService from '../../services/MarvelService';
 import { useState, useEffect } from 'react';
 
 const CharList = (props) => {
     const [characters, setCharacters] = useState([]);
-    const [isCharactersLoading, setIsCharactersLoading] = useState(true);
     const [offset, setOffset] = useState(0);
     const [isAllCharactersLoaded, setIsAllCharactersLoaded] = useState(false);
     const [selectedCharacterId, setSelectedCharacterId] = useState(null);
-
-    const marvelService = new MarvelService();
+    const { getCharacters, loading, error, clearError } = useMarvelService();
 
     useEffect(() => {
-        getCharacters();
+        getNewCharacters();
     }, [])
 
-
-    const getCharacters = () => {
-        marvelService.getCharacters(offset)
-            .then(onCharactersLoaded)
+    const getNewCharacters = () => {
+        clearError();
+        getCharacters(offset)
+            .then(onCharactersLoaded);
     }
 
     const onCharactersLoaded = (newCharacters) => {
         const newIsAllCharactersLoadedValue = newCharacters.length !== 9;
         setCharacters((characters) => [...characters, ...newCharacters]);
-        setIsCharactersLoading(false);
         setOffset(offset => offset + 9);
         setIsAllCharactersLoaded(newIsAllCharactersLoadedValue);
     }
 
-    const onCharacterSelect = (character) => {
-        setSelectedCharacterId(character.id);
-        props.onCharacterSelect(character);
+    const isNewCharactersLoadingUnavailable = () => {
+        return loading || error
     }
 
     const getCharactersItemsElements = () => {
@@ -45,14 +41,19 @@ const CharList = (props) => {
         });
     }
 
+    const onCharacterSelect = (character) => {
+        setSelectedCharacterId(character.id);
+        props.onCharacterSelect(character);
+    }
+
     return (
         <div className="char__list">
             <ul className="char__grid">
                 {getCharactersItemsElements()}
             </ul>
             <button className="button button__main button__long"
-                onClick={getCharacters}
-                disabled={isCharactersLoading}
+                onClick={getNewCharacters}
+                disabled={isNewCharactersLoadingUnavailable()}
                 style={{display: isAllCharactersLoaded ? 'none' : 'block'}}>
                 <div className="inner">load more</div>
             </button>

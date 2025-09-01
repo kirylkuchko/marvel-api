@@ -1,29 +1,21 @@
 import Character from "../models/Character";
+import { useHttp } from "../hooks/http.hook";
 
-export default class MarvelService {
-    _apiUrl = 'https://marvel-server-zeta.vercel.app/';
-    _apiKey = 'apikey=d4eecb0c66dedbfae4eab45d312fc1df';
+const useMarvelService = () => {
+    const _apiUrl = 'https://marvel-server-zeta.vercel.app/';
+    const _apiKey = 'apikey=d4eecb0c66dedbfae4eab45d312fc1df';
+    const { request, loading, error, clearError } = useHttp();
 
-    getResource = async (url) => {
-        let res = await fetch(url);
-    
-        if (!res.ok) {
-            throw new Error(`Could not fetch ${url}, status: ${res.status}`);
-        }
-    
-        return await res.json();
+    const getCharacters = async (offset = 0) => {
+        return getCharactersFromResponse(await request(`${_apiUrl}characters?limit=9&offset=${offset}&${_apiKey}`));
     }
 
-    getCharacters = async (offset = 0) => {
-        return this.#getCharactersFromResponse(await this.getResource(`${this._apiUrl}characters?limit=9&offset=${offset}&${this._apiKey}`));
+    const getCharacter = async (id) => {
+        const response = await request(`${_apiUrl}characters/${id}?${_apiKey}`);
+        return getCharacterFromResponse(response.data.results[0]);
     }
 
-    getCharacter = async (id) => {
-        const response = await this.getResource(`${this._apiUrl}characters/${id}?${this._apiKey}`);
-        return this.#getCharacterFromResponse(response.data.results[0]);
-    }
-
-    #getCharactersFromResponse = (response) => {
+    const getCharactersFromResponse = (response) => {
         if (!response) {
             throw new Error(`Incorrect data from server on fetching characters data`);
         }
@@ -31,13 +23,13 @@ export default class MarvelService {
         const charactersData = [];
 
         for (let charcterData of response.data.results) {
-            charactersData.push(this.#getCharacterFromResponse(charcterData));
+            charactersData.push(getCharacterFromResponse(charcterData));
         }
 
         return charactersData;
     }
 
-    #getCharacterFromResponse = (charcterData) => {
+    const getCharacterFromResponse = (charcterData) => {
         if (!charcterData) {
             return undefined;
         }
@@ -45,4 +37,8 @@ export default class MarvelService {
         return new Character(charcterData.id, charcterData.name, charcterData.description, charcterData.thumbnail.path,
                 charcterData.thumbnail.extension, charcterData.comics.items, charcterData.urls[0].url, charcterData.urls[1].url);
     }
+
+    return {getCharacter, getCharacters, loading, error, clearError};
 }
+
+export default useMarvelService;
