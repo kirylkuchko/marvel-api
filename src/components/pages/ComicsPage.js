@@ -1,16 +1,11 @@
-import { useState } from "react";
 import ComicsList from "../comicsList/ComicsList";
+import AppBanner from "../appBanner/AppBanner";
 
 const ComicsPage = (props) => {
-    const [selectedComic, setSelectedComic] = useState(null);
-
-    const onComicSelect = (selectedComic) => {
-        setSelectedComic(selectedComic);
-    }
-
     return (
         <>
-            <ComicsList onComicSelect={onComicSelect}/>
+            <AppBanner/>
+            <ComicsList/>
         </>
     )
 }

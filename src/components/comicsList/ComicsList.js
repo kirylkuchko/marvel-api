@@ -1,7 +1,7 @@
 import './comicsList.scss';
 import { useEffect, useState } from 'react';
 import useMarvelService from '../../services/MarvelService';
-import { NavLink } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import Spinner from '../spinner/Spinner';
 import ErrorMessage from '../errorMessage/errorMessage';
 
@@ -43,7 +43,7 @@ const ComicsList = (props) => {
 
         return (
             <ul className="comics__grid">
-                { comics.map((comic) => <ComicItem key={comic.id} title={comic.title} img={comic.img} price={comic.price} onComicSelect={() => props.onComicSelect(comic)}/>) }
+                { comics.map((comic) => <ComicItem key={comic.id} id={comic.id} title={comic.title} img={comic.img} price={comic.price}/>) }
             </ul>
         );
     }
@@ -64,15 +64,15 @@ const ComicsList = (props) => {
 export default ComicsList;
 
 const ComicItem = (props) => {
-    const { title, img, price, onComicSelect } = props;
+    const { id, title, img, price } = props;
 
     return (
-        <li className="comics__item" onClick={onComicSelect}>
-            <NavLink to='#'>
+        <li className="comics__item">
+            <Link to={`/comics/${id}`}>
                 <img src={img} alt={title} className="comics__item-img"/>
                 <div className="comics__item-name">{title}</div>
                 <div className="comics__item-price">{price}$</div>
-            </NavLink>
+            </Link>
         </li>
     )
 }
