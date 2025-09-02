@@ -1,6 +1,8 @@
 import './charList.scss';
 import useMarvelService from '../../services/MarvelService';
 import { useState, useEffect } from 'react';
+import Spinner from '../spinner/Spinner';
+import ErrorMessage from '../errorMessage/errorMessage';
 
 const CharList = (props) => {
     const [characters, setCharacters] = useState([]);
@@ -30,27 +32,36 @@ const CharList = (props) => {
         return loading || error
     }
 
-    const getCharactersItemsElements = () => {
-        return characters.map((character) => {
-            return <CharItem 
-                key={character.id} 
-                name={character.name} 
-                img={character.img} 
-                onCharacterSelect={() => {onCharacterSelect(character)}}
-                isSelected={selectedCharacterId === character.id}/>
-        });
-    }
-
     const onCharacterSelect = (character) => {
         setSelectedCharacterId(character.id);
         props.onCharacterSelect(character);
     }
 
+    const getCharactersView = () => {
+        if (loading && characters.length < 9) {
+            return <Spinner/>;
+        }
+
+        if (error) {
+            return <ErrorMessage/>;
+        }
+
+        return (
+            <ul className="char__grid">
+                { characters.map((character) => <CharItem 
+                    key={character.id} 
+                    name={character.name} 
+                    img={character.img} 
+                    onCharacterSelect={() => {onCharacterSelect(character)}}
+                    isSelected={selectedCharacterId === character.id}
+                />) }
+            </ul>
+        );
+    }
+
     return (
         <div className="char__list">
-            <ul className="char__grid">
-                {getCharactersItemsElements()}
-            </ul>
+            {getCharactersView()}
             <button className="button button__main button__long"
                 onClick={getNewCharacters}
                 disabled={isNewCharactersLoadingUnavailable()}
